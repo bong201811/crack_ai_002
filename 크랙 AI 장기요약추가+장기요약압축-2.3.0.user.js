@@ -193,42 +193,49 @@
     }
 
     async function fetchSummaries() {
-        let allSummaries = [];
-        let cursor = null;
-        while (true) {
-            let path = '/summaries?limit=20&type=longTerm';
-            if (cursor) path += '&cursor=' + encodeURIComponent(cursor);
-            let res = await apiCall('GET', path);
-            if (!res || !res.data || !res.data.summaries || res.data.summaries.length === 0) break;
-            allSummaries = allSummaries.concat(res.data.summaries);
-            if (res.data.hasNext && res.data.nextCursor) cursor = res.data.nextCursor;
-            else break;
+    let allSummaries = [];
+    let cursor = null;
+    while (true) {
+        let path = '/summaries?limit=20&type=longTerm';
+        if (cursor) path += '&cursor=' + encodeURIComponent(cursor);
+        let res = await apiCall('GET', path);
+        if (!res || !res.data || !res.data.summaries || res.data.summaries.length === 0) break;
+        allSummaries = allSummaries.concat(res.data.summaries);
+        if (res.data.nextCursor) {
+            cursor = res.data.nextCursor;
+        } else {
+            break;
         }
-        return allSummaries;
     }
+    return allSummaries;
+}
 
-    async function fetchRecentMessages(limit) {
-        let allMessages = [];
-        let cursor = null;
-        let requestedLimit = parseInt(limit, 10);
-        if (isNaN(requestedLimit)) requestedLimit = 15;
-        const isUnlimited = requestedLimit === 0;
-        while (true) {
-            let fetchLimit = isUnlimited ? 50 : Math.min(requestedLimit - allMessages.length, 50);
-            let path = '/messages?limit=' + fetchLimit;
-            if (cursor) path += '&cursor=' + encodeURIComponent(cursor);
-            let res = await apiCall('GET', path);
-            if (!res || !res.data || !res.data.messages || res.data.messages.length === 0) break;
-            allMessages = allMessages.concat(res.data.messages);
-            if (!isUnlimited && allMessages.length >= requestedLimit) break;
-            if (res.data.hasNext && res.data.nextCursor) cursor = res.data.nextCursor;
-            else break;
+async function fetchRecentMessages(limit) {
+    let allMessages = [];
+    let cursor = null;
+    let requestedLimit = parseInt(limit, 10);
+    if (isNaN(requestedLimit)) requestedLimit = 15;
+    const isUnlimited = requestedLimit === 0;
+    while (true) {
+        let fetchLimit = isUnlimited ? 50 : Math.min(requestedLimit - allMessages.length, 50);
+        let path = '/messages?limit=' + fetchLimit;
+        if (cursor) path += '&cursor=' + encodeURIComponent(cursor);
+        let res = await apiCall('GET', path);
+        if (!res || !res.data || !res.data.messages || res.data.messages.length === 0) break;
+        allMessages = allMessages.concat(res.data.messages);
+        if (!isUnlimited && allMessages.length >= requestedLimit) break;
+        if (res.data.nextCursor) {
+            cursor = res.data.nextCursor;
+        } else {
+            break;
         }
-        if (!isUnlimited) allMessages = allMessages.slice(0, requestedLimit);
-        if (allMessages.length === 0) return null;
-        let msgs = allMessages.reverse();
-        return msgs.map(m => (m.role === 'user' ? 'User' : 'Character') + ': ' + m.content).join('\n\n');
     }
+    if (!isUnlimited) allMessages = allMessages.slice(0, requestedLimit);
+    if (allMessages.length === 0) return null;
+    let msgs = allMessages.reverse();
+    return msgs.map(m => (m.role === 'user' ? 'User' : 'Character') + ': ' + m.content).join('\n\n');
+}
+   
 
     async function callAI(provider, config, chatLog, turns, style, isCompress) {
         const promptKey = isCompress ? 'crack_ext_compress_prompt' : 'crack_ext_custom_prompt';
