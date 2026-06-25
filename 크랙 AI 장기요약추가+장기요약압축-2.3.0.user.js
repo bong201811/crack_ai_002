@@ -8,7 +8,10 @@
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
 // @grant        GM_getValue
+// @updateURL    chrome-extension://dhdgffkkebhmkfjojejmpbldmpobfkfo/ask.html?aid=09df8c70-6b84-4e66-9b20-293b620fa7bd
+// @downloadURL  chrome-extension://dhdgffkkebhmkfjojejmpbldmpobfkfo/options.html#nav=4b4b01aa-fa62-4d19-8dd3-cbe1f20e6db6+editor
 // @run-at       document-idle
+
 // ==/UserScript==
 
 (function () {
