@@ -582,7 +582,13 @@ body[data-theme="dark"] .crack-ext-ai-mbtn-save{background:#388E3C!important}`;
             if (selected.length === 0) return alert('압축할 항목을 선택해주세요.');
 
             var combinedText = selected.map(s => '[' + s.title + ']\n' + (s.summary || '') + '\n').join('\n---\n\n');
-
+// 메인 모달에서 선택된 모델 즉시 저장
+var mainModel = document.getElementById('ce-ai-model');
+var mainProvider = document.getElementById('ce-ai-provider');
+if (mainModel && mainProvider) {
+    localStorage.setItem('crack_ext_api_provider', mainProvider.value);
+    localStorage.setItem('crack_ext_' + mainProvider.value + '_model', mainModel.value);
+}
             var provider = localStorage.getItem('crack_ext_api_provider') || 'google';
             var model = localStorage.getItem('crack_ext_' + provider + '_model') || 'gemini-3.1-pro-preview';
             var apiKey = provider === 'deepseek' ? (localStorage.getItem('crack_ext_deepseek_key') || '') : (localStorage.getItem('crack_ext_gemini_key') || '');
