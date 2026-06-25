@@ -705,6 +705,9 @@ body[data-theme="dark"] .crack-ext-ai-mbtn-save{background:#388E3C!important}`;
             }
             updateModelOptions(p);
         };
+                selModel.addEventListener('change', function() {
+            localStorage.setItem('crack_ext_' + selProvider.value + '_model', selModel.value);
+        });
 
         selPrompt.onchange = function() {
             currentPromptMode = selPrompt.value;
